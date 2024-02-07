@@ -1,7 +1,16 @@
+import { useDispatch } from "react-redux";
 import { LogoutOutlined, MenuOutlined } from "@mui/icons-material";
 import { AppBar, IconButton, Toolbar, Typography, Grid } from "@mui/material";
+import { startLogoutFirebase } from "../../store/auth";
 
 export const Navbar = ({ drawerWidth = 240 }) => {
+
+  const dispatch = useDispatch();
+
+  const onLogout = () => {
+    dispatch(startLogoutFirebase());
+  }
+  
   return (
     <AppBar
       position="fixed"
@@ -34,6 +43,7 @@ export const Navbar = ({ drawerWidth = 240 }) => {
             aria-label="menu"
             sx={{ ml: 2 }}
             title="Logout"
+            onClick={onLogout}
           >
             <LogoutOutlined />
           </IconButton>

@@ -1,3 +1,5 @@
+import React from "react";
+import { useSelector } from "react-redux";
 import {
   Box,
   Divider,
@@ -14,6 +16,8 @@ import {
 import { TurnedInNot } from "@mui/icons-material";
 
 export const Sidebar = ({ drawerWidth = 240 }) => {
+  const { displayName } = useSelector((state) => state.auth);
+
   return (
     <Box
       component="nav"
@@ -29,7 +33,7 @@ export const Sidebar = ({ drawerWidth = 240 }) => {
       >
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Matías
+            {displayName || "Unnamed"}
           </Typography>
         </Toolbar>
         <Divider />
