@@ -1,9 +1,51 @@
+import React, { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { SaveOutlined } from "@mui/icons-material";
 import { Button, Grid, TextField, Typography } from "@mui/material";
-import React from "react";
 import { ImageGallery } from "../components";
+import { useForm } from "../../hooks/useForm";
+import { setActiveNote, startSaveNote } from "../../store/journal";
+import Swal from "sweetalert2";
 
 export const NoteView = () => {
+  const dispatch = useDispatch();
+  const { activeNote, messageSaved, isSaving } = useSelector((state) => state.journal);
+  const { title, body, date, onInputChange, formState } = useForm(activeNote);
+
+  const dateString = useMemo(() => {
+    const newDate = new Date(date);
+    return newDate.toLocaleDateString("es-ES", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }, [date]);
+
+  useEffect(() => {
+    dispatch(setActiveNote(formState));
+  }, [formState]);
+
+  useEffect(() => {
+    if (messageSaved.length > 0) {
+      Swal.fire({
+        position: "center",
+        icon: "success",
+        title: "Great job!",
+        text: messageSaved,
+        showConfirmButton: false,
+        timer: 2000,
+        customClass: 'swal-wide',
+        timerProgressBar: true,
+      });
+    }
+  }, [messageSaved]);
+
+  const onSaveNote = () => {
+    dispatch(startSaveNote());
+  };
+
   return (
     <Grid
       className="animate__animated animate__fadeIn animate__faster"
@@ -15,12 +57,12 @@ export const NoteView = () => {
     >
       <Grid item>
         <Typography fontSize={20} fontWeight="light">
-          28 de agosto
+          {dateString}
         </Typography>
       </Grid>
 
       <Grid item>
-        <Button variant="outlined" color="primary">
+        <Button variant="outlined" color="primary" onClick={onSaveNote} disabled={isSaving}>
           <SaveOutlined sx={{ fontSize: 16, mr: 1 }} />
           <Typography variant="p" fontSize={13}>
             Guardar
@@ -38,17 +80,22 @@ export const NoteView = () => {
           autoComplete="off"
           size="small"
           sx={{ border: "none", my: 2 }}
+          name="title"
+          value={title}
+          onChange={onInputChange}
         />
 
         <TextField
           type="text"
-          //   variant="filled"
           fullWidth
           multiline
           label="What happened today?"
           minRows={5}
           size="small"
           sx={{ border: "none", mb: 2 }}
+          name="body"
+          value={body}
+          onChange={onInputChange}
         />
 
         {/* Image Gallery */}
