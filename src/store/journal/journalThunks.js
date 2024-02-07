@@ -1,7 +1,7 @@
-import { collection, doc, setDoc } from "firebase/firestore/lite";
+import { collection, deleteDoc, doc, setDoc } from "firebase/firestore/lite";
 import { firebaseDB } from "../../firebase/config";
-import { addNewEmptyNote, setActiveNote, isSavingNewNote, setNotes, setSaving, updateNote } from "./journalSlice";
-import { loadNotes } from "../../helpers";
+import { addNewEmptyNote, setActiveNote, isSavingNewNote, setNotes, setSaving, updateNote, setPhotosToActiveNote, deleteNoteById } from "./journalSlice";
+import { fileUpload, loadNotes } from "../../helpers";
 
 export const startSetNotes = () => {
     return async (dispatch, getState) => {
@@ -31,7 +31,7 @@ export const startAddNewEmptyNote = () => {
         // Referencia a la colección de notas del usuario
         const ref = doc(collection(firebaseDB, `${uid}/journal/notes`));
         note.id = ref.id;
-        
+
         // Guardar la nota en la base de datos
         await setDoc(ref, note);
 
@@ -41,7 +41,7 @@ export const startAddNewEmptyNote = () => {
 }
 
 export const startSaveNote = () => {
-    return async(dispatch, getState) => {
+    return async (dispatch, getState) => {
 
         dispatch(setSaving());
 
@@ -59,5 +59,31 @@ export const startSaveNote = () => {
             id: ref.id,
             ...noteToSave
         }));
+    }
+}
+
+export const startUploadingFiles = (files = []) => {
+    return async (dispatch, getState) => {
+        dispatch(setSaving());
+
+        const fileUploadPromises = [];
+        for (const file of files) {
+            fileUploadPromises.push(fileUpload(file));
+        }
+
+        const photosUrls = await Promise.all(fileUploadPromises);
+
+        dispatch(setPhotosToActiveNote(photosUrls));
+    }
+}
+
+
+export const startDeletingNote = () => {
+    return async (dispatch, getState) => {
+        const { uid } = getState().auth;
+        const { activeNote } = getState().journal;
+        const docRef = doc(firebaseDB, `${uid}/journal/notes/${activeNote.id}`);
+        await deleteDoc(docRef);
+        dispatch(deleteNoteById(activeNote.id));
     }
 }

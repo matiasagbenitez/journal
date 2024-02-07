@@ -1,9 +1,9 @@
 import { useSelector } from "react-redux";
 import { Box, Divider, Drawer, List, Toolbar, Typography } from "@mui/material";
 import { SidebarItem } from "./SidebarItem";
+import { Fragment } from "react";
 
 export const Sidebar = ({ drawerWidth = 240 }) => {
-  const { displayName } = useSelector((state) => state.auth);
   const { notes } = useSelector((state) => state.journal);
 
   return (
@@ -20,15 +20,33 @@ export const Sidebar = ({ drawerWidth = 240 }) => {
         }}
       >
         <Toolbar>
-          <Typography variant="h6" noWrap component="div">
-            {displayName || "Unnamed"}
+          <Typography
+            variant="h1"
+            fontSize={30}
+            fontWeight={600}
+            noWrap
+            component="div"
+            sx={{ width: "100%", textAlign: "center" }}
+          >
+            MyJournal
           </Typography>
         </Toolbar>
         <Divider />
         <List>
-          {notes.map((note, index) => (
-            <SidebarItem key={index} note={note} />
-          ))}
+          {notes.length > 0 ? (
+            notes.map((note) => <SidebarItem key={note.id} note={note} />)
+          ) : (
+              <Typography
+                sx={{ p: 2, width: "100%" }}
+                fontSize={14}
+                textAlign={"center"}
+                fontStyle={"italic"}
+              >
+                No entries yet 😢
+                <br />
+                Start by creating a new one!
+              </Typography>
+          )}
         </List>
       </Drawer>
     </Box>
