@@ -19,8 +19,8 @@ import { AuthLayout } from "../layout/AuthLayout";
 import { useForm } from "../../hooks";
 
 const initialForm = {
-  email: "matias@correo.com",
-  password: "password",
+  email: "",
+  password: "",
 };
 
 const formValidations = {
